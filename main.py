@@ -1,10 +1,23 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
 import pandas as pd
 
 # Load trained model
 model = joblib.load("reverse_yield_pipeline.pkl")
+
+# Create FastAPI app
+app = FastAPI(title="Fertilizer Recommendation API")
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace with specific frontend domain in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Define request schema
 class PredictInput(BaseModel):
@@ -14,9 +27,6 @@ class PredictInput(BaseModel):
     Humidity: float
     Wind_Speed: float
     Crop_Yield: float
-
-# Create FastAPI app
-app = FastAPI(title="Fertilizer Recommendation API")
 
 @app.get("/")
 def home():
